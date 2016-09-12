@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_demand_play"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_orange_light"
+        android:layout_marginTop="15dp"
+        android:text="视频点播"/>
+    <TextView
+        android:id="@+id/tv_live_play"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_blue_bright"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="视频直播"
+        android:layout_marginTop="15dp"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/tv_listview_player"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_green_light"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="视频点播（listView）"
+        android:layout_marginTop="15dp"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/tv_recycleview_player"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_red_light"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="视频点播（recycleView）"
+        android:layout_marginTop="15dp"
+        android:textColor="@android:color/white" />
+
+</LinearLayout>
