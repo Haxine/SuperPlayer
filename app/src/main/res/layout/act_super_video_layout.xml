@@ -3,11 +3,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <include
-        android:layout_width="match_parent"
-        android:layout_height="210dp"
-        layout="@layout/view_super_player" />
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="210dp"
+            layout="@layout/view_super_player" />
+
+        <TextView
+            android:id="@+id/tv_super_player_complete"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"
+            android:visibility="gone"
+            android:text="视频播放完成"/>
+
+    </FrameLayout>
     <TextView
         android:id="@+id/tv_replay"
         android:layout_width="match_parent"
@@ -17,4 +32,27 @@
         android:padding="10dp"
         android:text="重新播放"
         android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/tv_play_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_red_light"
+        android:gravity="center"
+        android:layout_marginTop="15dp"
+        android:padding="10dp"
+        android:text="播放在指定位置"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/tv_play_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_orange_light"
+        android:gravity="center"
+        android:layout_marginTop="15dp"
+        android:padding="10dp"
+        android:text="切换播放源"
+        android:textColor="@android:color/white" />
+
 </LinearLayout>

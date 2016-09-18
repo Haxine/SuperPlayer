@@ -5,7 +5,7 @@
     android:layout_height="45dp"
     android:layout_alignParentBottom="true"
     android:background="#88000000"
-    android:visibility="visible" >
+    android:visibility="gone" >
 
     <LinearLayout
         android:id="@+id/view_jky_player_left"

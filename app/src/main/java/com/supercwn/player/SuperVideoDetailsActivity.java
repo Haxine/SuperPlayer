@@ -44,6 +44,8 @@ public class SuperVideoDetailsActivity extends AppCompatActivity implements View
      */
     private void initView(){
         findViewById(R.id.tv_replay).setOnClickListener(this);
+        findViewById(R.id.tv_play_location).setOnClickListener(this);
+        findViewById(R.id.tv_play_switch).setOnClickListener(this);
     }
 
     /**
@@ -69,7 +71,8 @@ public class SuperVideoDetailsActivity extends AppCompatActivity implements View
                         /**
                          * 监听视频是否已经播放完成了。（可以在这里处理视频播放完成进行的操作）
                          */
-
+//                        Toast.makeText(SuperVideoDetailsActivity.this,"播放完成",Toast.LENGTH_SHORT).show();
+//                        findViewById(R.id.tv_super_player_complete).setVisibility(View.VISIBLE);
                     }
                 }).onInfo(new SuperPlayer.OnInfoListener() {
                     @Override
@@ -98,6 +101,22 @@ public class SuperVideoDetailsActivity extends AppCompatActivity implements View
             if(player != null){
                 player.play(url);
             }
+        } else if(view.getId() == R.id.tv_play_location){
+            if(isLive){
+                Toast.makeText(this,"直播不支持指定播放",Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(player != null){
+                /**
+                 * 这个节点是根据视频的大小来获取的。不同的视频源节点也会不一致（一般用在退出视频播放后保存对应视频的节点从而来达到记录播放）
+                 */
+                player.play(url,99528);
+            }
+        } else if(view.getId() == R.id.tv_play_switch) {
+            /**
+             * 切换视频播放源（一般是标清，高清的切换ps：由于我没有找到高清，标清的视频源，所以也是换相同的地址）
+             */
+            player.playSwitch(url);
         }
     }
 

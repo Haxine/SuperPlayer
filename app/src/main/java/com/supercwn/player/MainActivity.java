@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view.getId() == R.id.tv_demand_play) {
             Intent demandIntent = new Intent(this,SuperVideoDetailsActivity.class);
             demandIntent.putExtra("isLive",false);
-            demandIntent.putExtra("url","http://krtv.qiniudn.com/150522nextapp");
+            demandIntent.putExtra("url","http://video.1mbz.com/job/201609/prxb4xK6WT.mp4");
             startActivity(demandIntent);
 
         } else if (view.getId() == R.id.tv_live_play) {
@@ -33,7 +33,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(liveIntent);
 
         } else if (view.getId() == R.id.tv_listview_player) {
-            Toast.makeText(this, "Super南仔还在努力的开发中", Toast.LENGTH_SHORT).show();
+            Intent listViewIntent = new Intent(this,SuperVideoListViewActivity.class);
+            startActivity(listViewIntent);
         } else if (view.getId() == R.id.tv_recycleview_player) {
             Toast.makeText(this, "Super南仔还在努力的开发中", Toast.LENGTH_SHORT).show();
         }

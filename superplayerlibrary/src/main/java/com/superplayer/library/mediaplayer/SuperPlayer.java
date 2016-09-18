@@ -102,6 +102,7 @@ public class SuperPlayer {
 	private int status = STATUS_IDLE;
 	private boolean isLive = false;// 是否为直播
 	private boolean isShowCenterControl = false;// 是否显示中心控制器
+	private boolean isHideControl = false;//是否隐藏视频控制栏
 	private boolean isPrepare = false;// 是否已经初始化播放
 	private boolean isNetListener = true;// 是否添加网络监听 (默认是监听)
 	// 网络监听回调
@@ -149,7 +150,6 @@ public class SuperPlayer {
 	private Runnable oncomplete = new Runnable() {
 		@Override
 		public void run() {
-
 		}
 	};
 	private OnInfoListener onInfoListener;
@@ -210,6 +210,12 @@ public class SuperPlayer {
 	 * @param timeout
 	 */
 	public void show(int timeout) {
+		if(isHideControl){
+			showBottomControl(false);
+			showCenterControl(false);
+			showTopControl(false);
+			return;
+		}
 		if (!isShowing && isPrepare) {
 			showTopControl(true);
 			if (isShowCenterControl) {
@@ -476,8 +482,6 @@ public class SuperPlayer {
 			showStatus(activity.getResources().getString(R.string.not_support),
 					"重试");
 		}
-		// 注册网路变化的监听
-		registerNetReceiver();
 	}
 
 	/**
@@ -684,6 +688,9 @@ public class SuperPlayer {
 		this.url = url;
 		if (!isNetListener) {// 如果设置不监听网络的变化，则取消监听网络变化的广播
 			unregisterNetReceiver();
+		} else {
+			// 注册网路变化的监听
+			registerNetReceiver();
 		}
 		if (isNetListener
 				&& (NetUtils.getNetworkType(activity) == 2 || NetUtils
@@ -1141,9 +1148,7 @@ public class SuperPlayer {
 				} else {
 					onBrightnessSlide(percent);
 				}
-
 			}
-
 			return super.onScroll(e1, e2, distanceX, distanceY);
 		}
 
@@ -1383,6 +1388,16 @@ public class SuperPlayer {
 	 */
 	public SuperPlayer showCenterControl(boolean isShow) {
 		this.isShowCenterControl = isShow;
+		return this;
+	}
+
+	/**
+	 * 点击的时候是否显示控制栏
+	 * @param isHideControl
+	 * @return
+     */
+	public SuperPlayer setHideControl(boolean isHideControl){
+		this.isHideControl = isHideControl;
 		return this;
 	}
 

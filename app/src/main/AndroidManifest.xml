@@ -24,6 +24,9 @@
             android:theme="@style/AppThemeNoTitleBar"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensor"/>
+        <!--listView中播放视频的演示-->
+        <activity android:name=".SuperVideoListViewActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
