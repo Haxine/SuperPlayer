@@ -24,7 +24,7 @@
         android:layout_marginTop="15dp"
         android:textColor="@android:color/white" />
 
-    <TextView
+    <!--<TextView
         android:id="@+id/tv_listview_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,6 +44,6 @@
         android:padding="10dp"
         android:text="视频点播（recycleView）"
         android:layout_marginTop="15dp"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white" />-->
 
 </LinearLayout>
