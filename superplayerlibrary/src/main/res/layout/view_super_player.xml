@@ -10,12 +10,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <include layout="@layout/view_super_player_center" />
+    <include
+        android:id="@+id/view_super_player_control"
+        layout="@layout/view_super_player_control"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
-    <!-- bottom -->
+    <!--<include layout="@layout/view_super_player_center" />
+
+    &lt;!&ndash; bottom &ndash;&gt;
 
     <include layout="@layout/view_super_player_bottom" />
 
-    <include layout="@layout/view_super_player_top" />
+    <include layout="@layout/view_super_player_top" />-->
 
 </RelativeLayout>
