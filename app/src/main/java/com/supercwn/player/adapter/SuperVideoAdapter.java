@@ -56,7 +56,7 @@ public class SuperVideoAdapter extends RecyclerView.Adapter<SuperVideoAdapter.Vi
             rlayPlayer = (RelativeLayout) itemView.findViewById(R.id.adapter_super_video_layout);
             if (rlayPlayer!=null){
                 RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) rlayPlayer.getLayoutParams();
-                layoutParams.height = (int) (SuperPlayerUtils.getScreenWidth((Activity) mContext) * 0.5652f);
+                layoutParams.height = (int) (SuperPlayerUtils.getScreenWidth((Activity) mContext) * 0.5652f);//这值是网上抄来的，我设置了这个之后就没有全屏回来拉伸的效果，具体为什么我也不太清楚
                 rlayPlayer.setLayoutParams(layoutParams);
             }
         }

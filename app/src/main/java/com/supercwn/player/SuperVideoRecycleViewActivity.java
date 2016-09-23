@@ -99,7 +99,6 @@ public class SuperVideoRecycleViewActivity extends Activity {
                 player.showView(R.id.adapter_player_control);
                 frameLayout.addView(player);
                 player.play(dataList.get(position).getVideoUrl());
-//                player.play("http://bvideo.spriteapp.cn/video/2016/0704/577a4c29e1f14_wpd.mp4");
                 lastPostion = position;
             }
         });

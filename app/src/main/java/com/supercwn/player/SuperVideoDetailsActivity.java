@@ -75,8 +75,6 @@ public class SuperVideoDetailsActivity extends AppCompatActivity implements View
                         /**
                          * 监听视频是否已经播放完成了。（可以在这里处理视频播放完成进行的操作）
                          */
-//                        Toast.makeText(SuperVideoDetailsActivity.this,"播放完成",Toast.LENGTH_SHORT).show();
-//                        findViewById(R.id.tv_super_player_complete).setVisibility(View.VISIBLE);
                     }
                 }).onInfo(new SuperPlayer.OnInfoListener() {
                     @Override
