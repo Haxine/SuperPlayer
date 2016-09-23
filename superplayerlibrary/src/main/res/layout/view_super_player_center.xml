@@ -102,7 +102,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="50%"
-                    android:textColor="@android:color/tertiary_text_dark"
+                    android:textColor="@android:color/white"
                     android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>

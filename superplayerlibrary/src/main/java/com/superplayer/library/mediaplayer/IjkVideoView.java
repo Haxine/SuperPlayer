@@ -46,7 +46,6 @@ import tv.danmaku.ijk.media.player.AndroidMediaPlayer;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.TextureMediaPlayer;
-
 public class IjkVideoView extends FrameLayout implements
 		MediaController.MediaPlayerControl {
 	private String TAG = "IjkVideoView";
@@ -926,13 +925,14 @@ public class IjkVideoView extends FrameLayout implements
 			IRenderView.AR_ASPECT_FILL_PARENT,
 			IRenderView.AR_ASPECT_WRAP_CONTENT, IRenderView.AR_MATCH_PARENT,
 			IRenderView.AR_16_9_FIT_PARENT, IRenderView.AR_4_3_FIT_PARENT };
-	private int mCurrentAspectRatioIndex = 1;
+	private int mCurrentAspectRatioIndex = 3;//默认是不拉伸填充
 	private int mCurrentAspectRatio = s_allAspectRatio[mCurrentAspectRatioIndex];
 
 	public int toggleAspectRatio() {
 		mCurrentAspectRatioIndex++;
-		mCurrentAspectRatioIndex %= s_allAspectRatio.length;
-
+		if(mCurrentAspectRatioIndex>5){
+			mCurrentAspectRatioIndex = 0;
+		}
 		mCurrentAspectRatio = s_allAspectRatio[mCurrentAspectRatioIndex];
 		if (mRenderView != null)
 			mRenderView.setAspectRatio(mCurrentAspectRatio);
@@ -991,6 +991,7 @@ public class IjkVideoView extends FrameLayout implements
 		for (int i = 0; i < s_allAspectRatio.length; i++) {
 			if (s_allAspectRatio[i] == aspectRatio) {
 				mCurrentAspectRatioIndex = i;
+				mCurrentAspectRatio = s_allAspectRatio[mCurrentAspectRatioIndex];
 				if (mRenderView != null) {
 					mRenderView.setAspectRatio(mCurrentAspectRatio);
 				}

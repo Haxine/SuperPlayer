@@ -7,10 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import com.superplayer.library.mediaplayer.SuperPlayer;
+import com.superplayer.library.SuperPlayer;
 
 /**
- * Created by Administrator on 2016-09-12.
+ *
+ * 类描述：视频详情页
+ *
+ * @author Super南仔
+ * @time 2016-9-19
  */
 public class SuperVideoDetailsActivity extends AppCompatActivity implements View.OnClickListener, SuperPlayer.OnNetChangeListener {
 
@@ -52,7 +56,7 @@ public class SuperVideoDetailsActivity extends AppCompatActivity implements View
      * 初始化播放器
      */
     private void initPlayer(){
-        player = new SuperPlayer(this);
+        player = (SuperPlayer) findViewById(R.id.view_super_player);
         if(isLive){
             player.setLive(true);//设置该地址是直播的地址
         }
@@ -92,7 +96,7 @@ public class SuperVideoDetailsActivity extends AppCompatActivity implements View
                     }
                 }).setTitle(url)//设置视频的titleName
                 .play(url);//开始播放视频
-
+        player.setScaleType(SuperPlayer.SCALETYPE_FITXY);
     }
 
     @Override
@@ -110,13 +114,17 @@ public class SuperVideoDetailsActivity extends AppCompatActivity implements View
                 /**
                  * 这个节点是根据视频的大小来获取的。不同的视频源节点也会不一致（一般用在退出视频播放后保存对应视频的节点从而来达到记录播放）
                  */
-                player.play(url,99528);
+                player.play(url,89528);
             }
         } else if(view.getId() == R.id.tv_play_switch) {
             /**
              * 切换视频播放源（一般是标清，高清的切换ps：由于我没有找到高清，标清的视频源，所以也是换相同的地址）
              */
+        if(isLive){
             player.playSwitch(url);
+        } else {
+            player.playSwitch("http://baobab.wandoujia.com/api/v1/playUrl?vid=2614&editionType=high");
+        }
         }
     }
 

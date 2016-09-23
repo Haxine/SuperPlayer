@@ -24,17 +24,6 @@
         android:layout_marginTop="15dp"
         android:textColor="@android:color/white" />
 
-    <!--<TextView
-        android:id="@+id/tv_listview_player"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/holo_green_light"
-        android:gravity="center"
-        android:padding="10dp"
-        android:text="视频点播（listView）"
-        android:layout_marginTop="15dp"
-        android:textColor="@android:color/white" />
-
     <TextView
         android:id="@+id/tv_recycleview_player"
         android:layout_width="match_parent"
@@ -42,8 +31,8 @@
         android:background="@android:color/holo_red_light"
         android:gravity="center"
         android:padding="10dp"
-        android:text="视频点播（recycleView）"
+        android:text="列表播放"
         android:layout_marginTop="15dp"
-        android:textColor="@android:color/white" />-->
+        android:textColor="@android:color/white" />
 
 </LinearLayout>

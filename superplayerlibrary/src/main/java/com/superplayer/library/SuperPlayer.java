@@ -1,4 +1,4 @@
-package com.superplayer.library.mediaplayer;
+package com.superplayer.library;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.os.Handler;
@@ -15,9 +14,9 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.OrientationEventListener;
@@ -26,19 +25,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.superplayer.library.R;
+import com.superplayer.library.mediaplayer.IRenderView;
+import com.superplayer.library.mediaplayer.IjkVideoView;
 import com.superplayer.library.utils.NetUtils;
+import com.superplayer.library.utils.SuperPlayerUtils;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
- * Created by tcking on 15/10/27.
+ *
+ * 类描述：视频播放控制类
+ *
+ * @author Super南仔
+ * @time 2016-9-19
  */
-public class SuperPlayer {
+public class SuperPlayer extends RelativeLayout{
 	/**
 	 * fitParent:scale the video uniformly (maintain the video's aspect ratio)
 	 * so that both dimensions (width and height) of the video will be equal to
@@ -78,17 +84,18 @@ public class SuperPlayer {
 	 * dimension of the view.不剪裁,非等比例拉伸画面到4:3,并完全显示在View中。
 	 */
 	public static final String SCALETYPE_4_3 = "4:3";
-
 	private static final int MESSAGE_SHOW_PROGRESS = 1;
 	private static final int MESSAGE_FADE_OUT = 2;
 	private static final int MESSAGE_SEEK_NEW_POSITION = 3;
 	private static final int MESSAGE_HIDE_CENTER_BOX = 4;
 	private static final int MESSAGE_RESTART_PLAY = 5;
-	private final Activity activity;
-	private final IjkVideoView videoView;
-	private final SeekBar seekBar;
-	private final AudioManager audioManager;
-	private final int mMaxVolume;
+	private Activity activity;
+	private Context context;
+	private View contentView;
+	private IjkVideoView videoView;
+	private SeekBar seekBar;
+	private AudioManager audioManager;
+	private int mMaxVolume;
 	private boolean playerSupport;
 	private String url;
 	private Query $;
@@ -103,6 +110,8 @@ public class SuperPlayer {
 	private boolean isLive = false;// 是否为直播
 	private boolean isShowCenterControl = false;// 是否显示中心控制器
 	private boolean isHideControl = false;//是否隐藏视频控制栏
+	private boolean isShowTopControl = true;//是否显示头部显示栏，true：竖屏也显示 false：竖屏不显示，横屏显示
+	private boolean isSupportGesture = false;//是否至此手势操作，false ：小屏幕的时候不支持，全屏的支持；true : 小屏幕还是全屏都支持
 	private boolean isPrepare = false;// 是否已经初始化播放
 	private boolean isNetListener = true;// 是否添加网络监听 (默认是监听)
 	// 网络监听回调
@@ -110,10 +119,28 @@ public class SuperPlayer {
 	private OnNetChangeListener onNetChangeListener;
 
 	private OrientationEventListener orientationEventListener;
-	final private int initHeight;
 	private int defaultTimeout = 3000;
 	private int screenWidthPixels;
 
+	public SuperPlayer(Context context) {
+		this(context, null);
+	}
+
+	public SuperPlayer(Context context, AttributeSet attrs) {
+		this(context, attrs, 0);
+	}
+
+	public SuperPlayer(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		this.context = context;
+		activity = (Activity) this.context;
+		//初始化view和其他相关的
+		initView();
+	}
+
+	/**
+	 * 相应点击事件
+	 */
 	private final View.OnClickListener onClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -209,7 +236,7 @@ public class SuperPlayer {
 	/**
 	 * @param timeout
 	 */
-	public void show(int timeout) {
+	private void show(int timeout) {
 		if(isHideControl){
 			showBottomControl(false);
 			showCenterControl(false);
@@ -217,7 +244,11 @@ public class SuperPlayer {
 			return;
 		}
 		if (!isShowing && isPrepare) {
-			showTopControl(true);
+			if(!isShowTopControl && portrait){
+				showTopControl(false);
+			} else {
+				showTopControl(true);
+			}
 			if (isShowCenterControl) {
 				$.id(R.id.view_jky_player_center_control).visible();
 			}
@@ -344,7 +375,10 @@ public class SuperPlayer {
 		}
 	};
 
-	public SuperPlayer(final Activity activity) {
+	/**
+	 * 初始化视图
+	 */
+	public void initView() {
 		try {
 			IjkMediaPlayer.loadLibrariesOnce(null);
 			IjkMediaPlayer.native_profileBegin("libijkplayer.so");
@@ -352,10 +386,10 @@ public class SuperPlayer {
 		} catch (Throwable e) {
 			Log.e("GiraffePlayer", "loadLibraries error", e);
 		}
-		this.activity = activity;
 		screenWidthPixels = activity.getResources().getDisplayMetrics().widthPixels;
 		$ = new Query(activity);
-		videoView = (IjkVideoView) activity.findViewById(R.id.video_view);
+		contentView = View.inflate(context, R.layout.view_super_player, this);
+		videoView = (IjkVideoView) contentView.findViewById(R.id.video_view);
 		videoView
 				.setOnCompletionListener(new IMediaPlayer.OnCompletionListener() {
 					@Override
@@ -410,6 +444,7 @@ public class SuperPlayer {
 					@Override
 					public void run() {
 						hide(false);
+						show(defaultTimeout);
 					}
 				}, 500);
 				if (onPreparedListener != null) {
@@ -418,7 +453,7 @@ public class SuperPlayer {
 			}
 		});
 
-		seekBar = (SeekBar) activity.findViewById(R.id.app_video_seekBar);
+		seekBar = (SeekBar) contentView.findViewById(R.id.app_video_seekBar);
 		seekBar.setMax(1000);
 		seekBar.setOnSeekBarChangeListener(mSeekListener);
 		$.id(R.id.app_video_play).clicked(onClickListener);
@@ -433,7 +468,7 @@ public class SuperPlayer {
 		final GestureDetector gestureDetector = new GestureDetector(activity,
 				new PlayerGestureListener());
 
-		View liveBox = activity.findViewById(R.id.app_video_box);
+		View liveBox = contentView.findViewById(R.id.app_video_box);
 		liveBox.setClickable(true);
 		liveBox.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -452,6 +487,9 @@ public class SuperPlayer {
 			}
 		});
 
+		/**
+		 * 监听手机重力感应的切换屏幕的方向
+		 */
 		orientationEventListener = new OrientationEventListener(activity) {
 			@Override
 			public void onOrientationChanged(int orientation) {
@@ -471,12 +509,11 @@ public class SuperPlayer {
 				}
 			}
 		};
+
 		if (fullScreenOnly) {
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}
 		portrait = getScreenOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-		initHeight = activity.findViewById(R.id.app_video_box)
-				.getLayoutParams().height;
 		hideAll();
 		if (!playerSupport) {
 			showStatus(activity.getResources().getString(R.string.not_support),
@@ -499,6 +536,10 @@ public class SuperPlayer {
 
 	}
 
+	/**
+	 * 视频播放状态的改变
+	 * @param newStatus
+     */
 	private void statusChange(int newStatus) {
 		status = newStatus;
 		if (!isLive && newStatus == STATUS_COMPLETED) {// 当视频播放完成的时候
@@ -532,6 +573,9 @@ public class SuperPlayer {
 
 	}
 
+	/**
+	 * 隐藏全部的控件
+	 */
 	private void hideAll() {
 		$.id(R.id.view_jky_player_center_control).gone();
 		$.id(R.id.app_video_loading).gone();
@@ -541,6 +585,9 @@ public class SuperPlayer {
 		showTopControl(false);
 	}
 
+	/**
+	 * 暂停
+	 */
 	public void onPause() {
 		pauseTime = System.currentTimeMillis();
 		show(0);// 把系统状态栏显示出来
@@ -566,26 +613,36 @@ public class SuperPlayer {
 		}
 	}
 
+	/**
+	 * 监听全屏跟非全屏
+	 * @param newConfig
+     */
+	@Override
 	public void onConfigurationChanged(final Configuration newConfig) {
 		portrait = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT;
 		doOnConfigurationChanged(portrait);
 	}
-
 	private void doOnConfigurationChanged(final boolean portrait) {
 		if (videoView != null && !fullScreenOnly) {
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					tryFullScreen(!portrait);
+					setFullScreen(!portrait);
 					if (portrait) {
-						$.id(R.id.app_video_box).height(initHeight, false);
+						int screenWidth = SuperPlayerUtils.getScreenWidth(activity);
+						ViewGroup.LayoutParams layoutParams = getLayoutParams();
+						activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+						layoutParams.width = screenWidth;
+						layoutParams.height = screenWidth * 9 / 16;
+						setLayoutParams(layoutParams);
+						requestLayout();
 					} else {
-						int heightPixels = activity.getResources()
-								.getDisplayMetrics().heightPixels;
-						int widthPixels = activity.getResources()
-								.getDisplayMetrics().widthPixels;
-						$.id(R.id.app_video_box).height(
-								Math.min(heightPixels, widthPixels), false);
+						int heightPixels = activity.getResources().getDisplayMetrics().heightPixels;
+						int widthPixels = activity.getResources().getDisplayMetrics().widthPixels;
+						ViewGroup.LayoutParams layoutParams = getLayoutParams();
+						layoutParams.height = heightPixels;
+						layoutParams.width = widthPixels;
+						setLayoutParams(layoutParams);
 					}
 					updateFullScreenButton();
 				}
@@ -609,6 +666,7 @@ public class SuperPlayer {
 		}
 		setFullScreen(fullScreen);
 	}
+	// TODO 这个是防止项目没有引用v7包
 //	private void tryFullScreen(boolean fullScreen) {
 //		if (activity instanceof Activity) {
 //			android.app.ActionBar supportActionBar = ((Activity) activity)
@@ -643,6 +701,9 @@ public class SuperPlayer {
 
 	}
 
+	/**
+	 * 在activity中的onDestroy中需要回调
+	 */
 	public void onDestroy() {
 		unregisterNetReceiver();// 取消网络变化的监听
 		orientationEventListener.disable();
@@ -723,6 +784,11 @@ public class SuperPlayer {
 		play(url, (int) currentPosition);
 	}
 
+	/**
+	 * 格式化显示的时间
+	 * @param time
+	 * @return
+     */
 	private String generateTime(long time) {
 		int totalSeconds = (int) (time / 1000);
 		int seconds = totalSeconds % 60;
@@ -763,8 +829,6 @@ public class SuperPlayer {
 					break;
 			}
 		}
-		// if the device's natural orientation is landscape or if the device
-		// is square:
 		else {
 			switch (rotation) {
 				case Surface.ROTATION_0:
@@ -1002,7 +1066,7 @@ public class SuperPlayer {
 		}
 
 		public Query id(int id) {
-			view = activity.findViewById(id);
+			view = contentView.findViewById(id);
 			return this;
 		}
 
@@ -1054,47 +1118,6 @@ public class SuperPlayer {
 			}
 			return this;
 		}
-
-		private void size(boolean width, int n, boolean dip) {
-
-			if (view != null) {
-
-				ViewGroup.LayoutParams lp = view.getLayoutParams();
-
-				if (n > 0 && dip) {
-					n = dip2pixel(activity, n);
-				}
-
-				if (width) {
-					lp.width = n;
-				} else {
-					lp.height = n;
-				}
-
-				view.setLayoutParams(lp);
-
-			}
-
-		}
-
-		public void height(int height, boolean dip) {
-			size(false, height, dip);
-		}
-
-		public int dip2pixel(Context context, float n) {
-			int value = (int) TypedValue.applyDimension(
-					TypedValue.COMPLEX_UNIT_DIP, n, context.getResources()
-							.getDisplayMetrics());
-			return value;
-		}
-
-		public float pixel2dip(Context context, float n) {
-			Resources resources = context.getResources();
-			DisplayMetrics metrics = resources.getDisplayMetrics();
-			float dp = n / (metrics.densityDpi / 160f);
-			return dp;
-
-		}
 	}
 
 	public class PlayerGestureListener extends
@@ -1128,6 +1151,9 @@ public class SuperPlayer {
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 								float distanceX, float distanceY) {
+			if(!isSupportGesture && portrait){
+				return super.onScroll(e1, e2, distanceX, distanceY);
+			}
 			float mOldX = e1.getX(), mOldY = e1.getY();
 			float deltaY = mOldY - e2.getY();
 			float deltaX = mOldX - e2.getX();
@@ -1184,8 +1210,47 @@ public class SuperPlayer {
 		return videoView != null ? videoView.isPlaying() : false;
 	}
 
+	/**
+	 * 停止播放
+	 */
 	public void stop() {
-		videoView.stopPlayback();
+		if(videoView.isPlaying()) {
+			videoView.stopPlayback();
+		}
+	}
+
+	/**
+	 * 停止播放，（仅仅对列表播放）
+	 */
+	public void stopPlayVideo() {
+		if (this != null) {
+			videoView.stopPlayback();
+		}
+	}
+
+	/**
+	 * 释放资源
+	 */
+	public void release() {
+		videoView.release(true);
+		videoView.seekTo(0);
+	}
+
+	/**
+	 * 显示列表中的视图(仅仅对列表播放的一个方法)
+	 * @param viewId
+     */
+	public void showView(int viewId) {
+		ViewGroup last = (ViewGroup) this.getParent();//找到videoitemview的父类，然后remove
+		if (last != null) {
+			last.removeAllViews();
+			View itemView = (View) last.getParent();
+			if (itemView != null) {
+				View viewById = itemView.findViewById(viewId);
+				if (viewById != null)
+					viewById.setVisibility(View.VISIBLE);
+			}
+		}
 	}
 
 	/**
@@ -1202,6 +1267,11 @@ public class SuperPlayer {
 		return this;
 	}
 
+	/**
+	 * 快退快退（取决于传进来的percent）
+	 * @param percent
+	 * @return
+     */
 	public SuperPlayer forward(float percent) {
 		if (isLive || percent > 1 || percent < -1) {
 			return this;
@@ -1250,8 +1320,12 @@ public class SuperPlayer {
 	public void toggleFullScreen() {
 		if (getScreenOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {// 转小屏
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			if(isShowTopControl){
+				showTopControl(false);
+			}
 		} else {// 转全屏
 			activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+			showTopControl(true);
 		}
 		updateFullScreenButton();
 	}
@@ -1391,11 +1465,16 @@ public class SuperPlayer {
 		return this;
 	}
 
+	public SuperPlayer setShowTopControl(boolean isShowTopControl){
+		this.isShowTopControl = isShowTopControl;
+		return this;
+	}
+
 	/**
 	 * 点击的时候是否显示控制栏
 	 * @param isHideControl
 	 * @return
-     */
+	 */
 	public SuperPlayer setHideControl(boolean isHideControl){
 		this.isHideControl = isHideControl;
 		return this;
@@ -1411,6 +1490,26 @@ public class SuperPlayer {
 	public SuperPlayer setNetChangeListener(boolean isNetListener) {
 		this.isNetListener = isNetListener;
 		return this;
+	}
+
+	/**
+	 * 设置小屏幕是否支持手势操作（默认false）
+	 * @param isSupportGesture
+	 * 				true : 支持（小屏幕支持，大屏幕支持）
+	 * 				false ：不支持（小屏幕不支持,大屏幕支持）
+	 * @return
+     */
+	public SuperPlayer setSupportGesture(boolean isSupportGesture){
+		this.isSupportGesture = isSupportGesture;
+		return this;
+	}
+
+	/**
+	 * 获取到当前播放的状态
+	 * @return
+	 */
+	public int getVideoStatus() {
+		return videoView.getCurrentState();
 	}
 
 	/**

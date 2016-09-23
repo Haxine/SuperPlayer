@@ -25,7 +25,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensor"/>
         <!--listView中播放视频的演示-->
-        <activity android:name=".SuperVideoListViewActivity"
+        <activity android:name=".SuperVideoRecycleViewActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|layoutDirection"
             android:screenOrientation="portrait"/>
     </application>
 

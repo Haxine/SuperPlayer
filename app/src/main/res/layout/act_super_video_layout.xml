@@ -7,11 +7,15 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <include
+        <com.superplayer.library.SuperPlayer
+            android:id="@+id/view_super_player"
+            android:layout_width="match_parent"
+            android:layout_height="210dp"></com.superplayer.library.SuperPlayer>
+        <!--<include
             android:layout_width="match_parent"
             android:layout_height="210dp"
             layout="@layout/view_super_player" />
-
+-->
         <TextView
             android:id="@+id/tv_super_player_complete"
             android:layout_width="match_parent"
